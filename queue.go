@@ -1,7 +1,6 @@
 package taskq
 
 import (
-	"context"
 	"log"
 	"sync"
 )
@@ -11,7 +10,7 @@ import (
 	Process(interface{})
 }*/
 
-type Process func(ctx context.Context,job interface{})
+type Process func(job interface{})
 type Queue struct {
 	//Workers Number of goroutines(workers,consumers) to be used to process the jobs
 	Workers int
