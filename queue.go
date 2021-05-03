@@ -1,6 +1,7 @@
 package taskq
 
 import (
+	"context"
 	"log"
 	"sync"
 )
@@ -10,7 +11,7 @@ import (
 	Process(interface{})
 }*/
 
-type Process func(job interface{})
+type Process func(ctx context.Context,job interface{})
 type Queue struct {
 	//Workers Number of goroutines(workers,consumers) to be used to process the jobs
 	Workers int
@@ -61,10 +62,13 @@ func (q *Queue) Stop() {
 //in an unblocking way...(i.e if the JobQueue is full it will not block)
 //Returns false if the buffer is full
 //else if it is accepted the job it returns true
-//use case imagine you are receiving jobs and you want to prevent any more jobs from being submitted if the buffered channel
+//use case imagine you are receiving jobs and you want to prevent any more
+//jobs from being submitted if the buffered channel
 //is full..you can return an error to the user if this function returns false...
-//although a better approach would be to store it in redis is it is rejected for later processing once the JobQueue has available space
-//Note  if you are using a for loop to consume the jobs, its better  to use [Queue.EnqueueJobBlocking ] to prevent you from having a Busy wait(continuous pooling to check if a space is available to queue the job)
+//although a better approach would be to store it in redis is it is rejected for
+//later processing once the JobQueue has available space
+//Note  if you are using a for loop to consume the jobs, its better  to use [Queue.EnqueueJobBlocking ]
+//to prevent you from having a Busy wait(continuous pooling to check if a space is available to queue the job)
 //for example consider this program
 //type NonBlocking struct {
 //
@@ -77,7 +81,7 @@ func (q *Queue) Stop() {
 //}
 //func main() {
 //	nonBlocking := NonBlocking{}
-//	queue := yuri.NewQueue(1, 5, nonBlocking)
+//	queue := yuri.NewQueue(1, 5, nonBlocking.Process)
 //	go queue.StartWorkers()
 //	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 //	index := 0
