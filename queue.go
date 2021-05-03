@@ -5,12 +5,13 @@ import (
 	"sync"
 )
 
-// Process work on the queued item
+// JobCallBack work on the queued item
 /*type JobCallBack interface {
-	Process(interface{})
+	JobCallBack(interface{})
 }*/
 
-type Process func(job interface{})
+
+type JobCallBack func(job interface{})
 type Queue struct {
 	//Workers Number of goroutines(workers,consumers) to be used to process the jobs
 	Workers int
@@ -28,14 +29,14 @@ type Queue struct {
 	//QuitChan will be used to stop all goroutines [Queue.Workers]
 	QuitChan chan struct{}
 	//JobCallBack is the function to be called when a job is received
-	//it should implement Process
+	//it should implement JobCallBack
 	//when a job is received what should happen ?(call back)
-	JobCallBack Process
+	JobCallBack JobCallBack
 }
 
 // NewQueue create a new job Queue
 //and assign all required parameters
-func NewQueue(workers int, capacity int, jobCallBack Process) Queue {
+func NewQueue(workers int, capacity int, jobCallBack JobCallBack) Queue {
 	var wg sync.WaitGroup
 	jobQueue := make(chan interface{}, capacity)
 	quit := make(chan struct{})
@@ -72,7 +73,7 @@ func (q *Queue) Stop() {
 //type NonBlocking struct {
 //
 //}
-//func (N NonBlocking) Process(item interface{}) {
+//func (N NonBlocking) JobCallBack(item interface{}) {
 //
 //	time.Sleep(10*time.Second)
 //  fmt.Println("i have finished processing item item:", item)
@@ -80,7 +81,7 @@ func (q *Queue) Stop() {
 //}
 //func main() {
 //	nonBlocking := NonBlocking{}
-//	queue := yuri.NewQueue(1, 5, nonBlocking.Process)
+//	queue := yuri.NewQueue(1, 5, nonBlocking.JobCallBack)
 //	go queue.StartWorkers()
 //	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 //	index := 0
@@ -145,7 +146,7 @@ func (q *Queue) StartWorkers() {
 
 //worker is the function that will be run by each goroutine
 //The JobCallBack  function specifies what should happen to each payload received by each worker
-//Note each JobCallBack should implement yuri.Process i.e should have a process method
+//Note each JobCallBack should implement yuri.JobCallBack i.e should have a process method
 //The process method is what will be called on each job received
 //For example imagine your workers are receiving numbers and you wanted to check if the number is even
 //this is how you would go about it:
@@ -159,7 +160,7 @@ func (q *Queue) StartWorkers() {
 
 //}
 //
-//func (N NumberIsEvenQueue) Process(item interface{}) {
+//func (N NumberIsEvenQueue) JobCallBack(item interface{}) {
 //	//check if item is an integer first
 //	if n, ok := item.(int); ok {
 //		if n%2 == 0 {
@@ -175,7 +176,7 @@ func (q *Queue) StartWorkers() {
 //}
 //func main() {
 //	nonBlocking := NumberIsEvenQueue{}
-//	queue := yuri.NewQueue(1, 5, nonBlocking.Process)
+//	queue := yuri.NewQueue(1, 5, nonBlocking.JobCallBack)
 //	go queue.StartWorkers()
 //	for i := 1; i <= 10; i++ {
 //		queue.EnqueueJobBlocking(i)
