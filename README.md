@@ -35,7 +35,7 @@ func AddNumbers() (int, int) {
 }
 ```
 
-## How to use it with redis streams and pass to pass dependencies
+## How to use it with redis streams and  pass dependencies
 ```go
 import (
 	"context"
