@@ -127,6 +127,7 @@ func (q *Queue) EnqueueJobNonBlocking(job interface{}) bool {
 //this is better for your cpu utilization unlike [Queue.EnqueueJobNonBlocking]
 //when consuming a job via a for loop
 func (q *Queue) EnqueueJobBlocking(job interface{}) {
+
 	q.JobQueue <- job
 }
 

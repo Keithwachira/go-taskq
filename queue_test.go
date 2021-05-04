@@ -1,14 +1,21 @@
 package taskq
 
 import (
-	"log"
 	"testing"
 )
 
+func TestJobQueueCapacity(t *testing.T) {
+	q := NewQueue(1, 4, func(job interface{}) {})
+
+	checkIntEqual(t, "Queue capacity ", 4, cap(q.JobQueue))
+	q50 := NewQueue(1, 50, func(job interface{}) {})
+
+	checkIntEqual(t, "Queue capacity ", 50, cap(q50.JobQueue))
+
+}
 func TestQueue_EnqueueJobNonBlocking(t *testing.T) {
 	rejectedJobs := []int{}
 	q := NewQueue(1, 4, func(job interface{}) {
-		log.Print("received item here")
 
 	})
 	for i := 0; i < 10; i++ {
@@ -28,4 +35,60 @@ func checkIntEqual(t *testing.T, name string, expected, actual int) {
 		t.Errorf("%s returned unexpected value: got %d wanted %d",
 			name, actual, expected)
 	}
+}
+
+func TestQueue_EnqueueJobBlocking(t *testing.T) {
+	queuedJobs := []int{}
+	rejectedJobs := []int{}
+	done := make(chan bool)
+
+	q := NewQueue(1, 4, func(job interface{}) {
+		if number, ok := job.(int); ok {
+			if number == 9 {
+				//finished processing numbers
+
+				done <- true
+			}
+		}
+	})
+
+	go q.StartWorkers()
+	for i := 0; i < 10; i++ {
+		q.EnqueueJobBlocking(i)
+		queuedJobs = append(queuedJobs, i)
+	}
+	<-done
+
+	checkIntEqual(t, "Length JobQueue queued jobs ", 10, len(queuedJobs))
+	checkIntEqual(t, "Length JobQueue  rejected jobs ", 0, len(rejectedJobs))
+
+}
+
+func TestQueue_JobCallBack(t *testing.T) {
+	//we will subtract sum of all numbers from 100
+	//to test if our jobcallback is fine
+	done := make(chan bool)
+	initialValue := 100
+	sum := 0
+	q := NewQueue(1, 4, func(job interface{}) {
+		if number, ok := job.(int); ok {
+			sum += number
+			initialValue -= number
+
+			if number == 9 {
+				//finished processing numbers
+				done <- true
+			}
+		}
+	})
+
+	go q.StartWorkers()
+	for i := 0; i < 10; i++ {
+		q.EnqueueJobBlocking(i)
+	}
+	<-done
+
+	checkIntEqual(t, "Sum 0 to n ", 45, sum)
+	checkIntEqual(t, "100 minus sum ", 55, initialValue)
+
 }
