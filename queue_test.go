@@ -74,7 +74,7 @@ func TestQueue_JobCallBack(t *testing.T) {
 	initialValue := 100
 	sum := 0
 	var mutex = &sync.Mutex{}
-	q := NewQueue(1, 4, func(job interface{}) {
+	q := NewQueue(4, 4, func(job interface{}) {
 		if number, ok := job.(int); ok {
 			mutex.Lock()
 			sum += number
