@@ -12,6 +12,7 @@ import (
 // AddNumbers sample of how you can sum numbers
 func AddNumbers() (int, int) {
 	done := make(chan bool)
+	complete:=0
 	initialValue := 100
 	sum := 0
 	var mutex = &sync.Mutex{}
@@ -20,7 +21,8 @@ func AddNumbers() (int, int) {
 			mutex.Lock()
 			sum += number
 			initialValue -= number
-			if number == 9 {
+			complete+=1
+			if complete == 9 {
 				//finished processing numbers
 				done <- true
 			}

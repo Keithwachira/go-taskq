@@ -1,7 +1,9 @@
 package taskq
 
 import (
+	"sync"
 	"testing"
+
 )
 
 func TestJobQueueCapacity(t *testing.T) {
@@ -68,20 +70,23 @@ func TestQueue_JobCallBack(t *testing.T) {
 	//we will subtract sum of all numbers from 100
 	//to test if our jobcallback is fine
 	done := make(chan bool)
+	complete:=0
 	initialValue := 100
 	sum := 0
+	var mutex = &sync.Mutex{}
 	q := NewQueue(1, 4, func(job interface{}) {
 		if number, ok := job.(int); ok {
+			mutex.Lock()
 			sum += number
 			initialValue -= number
-
-			if number == 9 {
+			complete+=1
+			if complete == 9 {
 				//finished processing numbers
 				done <- true
 			}
+			mutex.Unlock()
 		}
 	})
-
 	go q.StartWorkers()
 	for i := 0; i < 10; i++ {
 		q.EnqueueJobBlocking(i)

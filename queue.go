@@ -70,32 +70,31 @@ func (q *Queue) Stop() {
 //Note  if you are using a for loop to consume the jobs, its better  to use [Queue.EnqueueJobBlocking ]
 //to prevent you from having a Busy wait(continuous pooling to check if a space is available to queue the job)
 //for example consider this program
-//type NonBlocking struct {
-//
-//}
-//func (N NonBlocking) JobCallBack(item interface{}) {
-//
-//	time.Sleep(10*time.Second)
-//  fmt.Println("i have finished processing item item:", item)
-//
-//}
-//func main() {
-//	nonBlocking := NonBlocking{}
-//	queue := yuri.NewQueue(1, 5, nonBlocking.JobCallBack)
-//	go queue.StartWorkers()
-//	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+//func ShowBusyWait() {
 //	index := 0
+//	done := make(chan bool)
+//	items := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+//	queue := taskq.NewQueue(1, 5, func(job interface{}) {
+//		time.Sleep(10 * time.Second)
+//
+//		if index == len(items) {
+//			done <- true
+//		}
+//		fmt.Println("i have finished processing item item:", job)
+//	})
+//	go queue.StartWorkers()
+//
 //out:
 //	for {
 //
 //		for index < len(items) {
-//
 //			item := items[index]
 //			queued := queue.EnqueueJobNonBlocking(item)
 //			if queued {
 //				log.Println("item added was", item)
 //				index += 1
 //				if index == len(items) {
+//
 //					//finished queueing all items break from outer loop
 //					break out
 //				}
@@ -108,7 +107,9 @@ func (q *Queue) Stop() {
 //
 //	}
 //	//to wait for workers to finish
-//	time.Sleep(50*time.Second)
+//	<-done
+//
+//	//time.Sleep(50 * time.Second)
 //}
 //since  the job is taking to long to be processed(delay of 10 second)
 //our program will continue looping until they is an empty slot for  to queue a job
