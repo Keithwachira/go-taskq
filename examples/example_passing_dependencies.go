@@ -35,6 +35,19 @@ func StartProcessingRedisStreams() {
 	q := taskq.NewQueue(5, 10, redisStreams.Process)
 	//call startWorkers it in a different go routine otherwise it will block
 	go q.StartWorkers()
+	//add something to the redis sream
+	data := map[string]interface{}{"tesd data": "data"}
+	err := rdb.XAdd(context.Background(), &redis.XAddArgs{
+		Stream:       "test_streams",
+		MaxLen:       0,
+		MaxLenApprox: 0,
+		ID:           "",
+		Values:       data,
+	}).Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	id := "0"
 	for {
 		var ctx = context.Background()
