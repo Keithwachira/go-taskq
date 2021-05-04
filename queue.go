@@ -7,7 +7,7 @@ import (
 
 // JobCallBack work on the queued item
 /*type JobCallBack interface {
-	JobCallBack(interface{})
+	Process(interface{})
 }*/
 
 
