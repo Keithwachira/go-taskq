@@ -10,14 +10,12 @@ It is made simple to make sure anyone can easily customize it for their need.
 func AddNumbers() (int, int) {
 	done := make(chan bool)
 	complete:=0
-	initialValue := 100
 	sum := 0
 	var mutex = &sync.Mutex{}
 	q := taskq.NewQueue(1, 4, func(job interface{}) {
 		if number, ok := job.(int); ok {
 			mutex.Lock()
 			sum += number
-			initialValue -= number
 			complete+=1
 			if complete == 9 {
 				//finished processing numbers
@@ -32,7 +30,7 @@ func AddNumbers() (int, int) {
 		q.EnqueueJobBlocking(i)
 	}
 	<-done
-	return sum, initialValue
+	return sum
 
 }
 ```
@@ -117,8 +115,8 @@ func StartProcessingRedisStreams() {
 
 
 ```
-## Some thing to note
-1. Always start  q.StartWorkers() in a new goroutine i.e(go q.StartWorkers()) otherwise it will block.
+## Somethings to note
+1. Always start  q.StartWorkers() in a new goroutine  i.e(go q.StartWorkers()) otherwise it will block.
 
 2. If you are consumming you events in a for loop it is better to use **EnqueueJobBlocking** than **EnqueueJobNonBlocking** to prevent unnessesary cpu usage.
 Consider the program below for instance:
