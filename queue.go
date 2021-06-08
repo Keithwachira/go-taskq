@@ -10,7 +10,6 @@ import (
 	Process(interface{})
 }*/
 
-
 type JobCallBack func(job interface{})
 type Queue struct {
 	//Workers Number of goroutines(workers,consumers) to be used to process the jobs

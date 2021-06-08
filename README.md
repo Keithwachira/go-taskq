@@ -5,6 +5,7 @@ Go-taskq is a simple golang job queue that you can use with redis streams or any
 It is made simple to make sure anyone can easily customize it for their need.
 
 ## Quickstart
+
 ```go
 // AddNumbers sample of how you can sum numbers
 func AddNumbers() (int, int) {
@@ -36,6 +37,7 @@ func AddNumbers() (int, int) {
 ```
 
 ## How to use it with redis streams and  pass dependencies
+
 ```go
 import (
 	"context"
@@ -115,11 +117,14 @@ func StartProcessingRedisStreams() {
 
 
 ```
-## Somethings to note
-1. Always start  q.StartWorkers() in a new goroutine  i.e(go q.StartWorkers()) otherwise it will block.
 
-2. If you are consumming you events in a for loop it is better to use **EnqueueJobBlocking** than **EnqueueJobNonBlocking** to prevent unnessesary cpu usage.
-Consider the program below for instance:
+## Somethings to note
+
+1. Always start q.StartWorkers() in a new goroutine i.e(go q.StartWorkers()) otherwise it will block.
+
+2. If you are consumming you events in a for loop it is better to use **EnqueueJobBlocking** than **
+   EnqueueJobNonBlocking** to prevent unnessesary cpu usage. Consider the program below for instance:
+
 ```go
 func ShowBusyWait() {
 	index := 0
@@ -163,8 +168,9 @@ out:
 	//time.Sleep(50 * time.Second)
 }
 ```
-If you consumer is slow (like in this case where we are sleeping for 10 seconds before processing a job) your for loop will continue looping waiting
-for a space in your job queue to open.Which will use unncecessary cpu.
-If we used EnqueueJobBlocking it would have blocked until a space was open in our queue.
+
+If you consumer is slow (like in this case where we are sleeping for 10 seconds before processing a job) your for loop
+will continue looping waiting for a space in your job queue to open.Which will use unncecessary cpu. If we used
+EnqueueJobBlocking it would have blocked until a space was open in our queue.
 
 

@@ -3,7 +3,6 @@ package taskq
 import (
 	"sync"
 	"testing"
-
 )
 
 func TestJobQueueCapacity(t *testing.T) {
@@ -70,7 +69,7 @@ func TestQueue_JobCallBack(t *testing.T) {
 	//we will subtract sum of all numbers from 100
 	//to test if our jobcallback is fine
 	done := make(chan bool)
-	complete:=0
+	complete := 0
 	initialValue := 100
 	sum := 0
 	var mutex = &sync.Mutex{}
@@ -79,7 +78,7 @@ func TestQueue_JobCallBack(t *testing.T) {
 			mutex.Lock()
 			sum += number
 			initialValue -= number
-			complete+=1
+			complete += 1
 			if complete == 9 {
 				//finished processing numbers
 				done <- true

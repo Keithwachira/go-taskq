@@ -10,7 +10,8 @@ import (
 	"github.com/keithwachira/go-taskq"
 )
 
-var streamName="send_order_emails"
+var streamName = "send_order_emails"
+
 func main() {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -21,7 +22,7 @@ func main() {
 	handler := http.NewServeMux()
 	///we create a new router to expose our api
 	//to our users
-	s:=Server{Redis: rdb}
+	s := Server{Redis: rdb}
 	handler.HandleFunc("/api/hello", s.NewOrderReceivedFromClient)
 	//Every time a  request is sent to the endpoint ("/api/hello")
 	//the function SayHello will be invoked
@@ -35,6 +36,7 @@ func main() {
 type Server struct {
 	Redis *redis.Client
 }
+
 // NewOrderReceivedFromClient this is mocking an endpoint that users use to place an order
 //once we receive an event here we should register it to redis
 //then the workers will pick it up and process it
@@ -42,7 +44,7 @@ func (S *Server) NewOrderReceivedFromClient(w http.ResponseWriter, r *http.Reque
 	data := map[string]interface{}{"email": "redis@gmail.com", "message": "We have received you order and we are working on it."}
 	//we have received  an order here send it to
 	//redis has a function called xadd that we will use to add this to our stream
-	err:=S.Redis.XAdd(context.Background(),&redis.XAddArgs{
+	err := S.Redis.XAdd(context.Background(), &redis.XAddArgs{
 		///this is the name we want to give to our stream
 		///in our case we called it send_order_emails
 		//note you can have as many stream as possible
@@ -53,10 +55,10 @@ func (S *Server) NewOrderReceivedFromClient(w http.ResponseWriter, r *http.Reque
 		ID:           "",
 		//values is the data you want to send to the stream
 		//in our case we send a map with email and message
-		Values:       data,
+		Values: data,
 	}).Err()
-	if err!=nil {
-		http.Error(w,"something went wrong",http.StatusInternalServerError)
+	if err != nil {
+		http.Error(w, "something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -85,7 +87,7 @@ func (r *RedisStreamsProcessing) Process(job interface{}) {
 
 }
 
-func StartProcessingEmails( *redis.Client) {
+func StartProcessingEmails(*redis.Client) {
 
 	//create and pass redis to our consumers
 	redisStreams := RedisStreamsProcessing{
