@@ -4,6 +4,7 @@ Go-taskq is a simple golang job queue that you can use with redis streams or any
 
 It is made simple to make sure anyone can easily customize it for their need.
 
+
 ## Quickstart
 
 ```go
