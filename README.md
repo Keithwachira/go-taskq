@@ -171,6 +171,6 @@ out:
 
 If you consumer is slow (like in this case where we are sleeping for 10 seconds before processing a job) your for loop
 will continue looping waiting for a space in your job queue to open.Which will use unncecessary cpu. If we used
-EnqueueJobBlocking it would have blocked until a space was open in our queue.
+EnqueueJobBlocking it would have blocked until a space was open in our queue .
 
 
